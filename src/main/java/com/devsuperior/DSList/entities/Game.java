@@ -79,7 +79,7 @@ public class Game {
     }
 
     public void setPlatform(String platforms) {
-        this.platforms = platform;
+        this.platforms = platforms;
     }
 
     public Double getScore() {
