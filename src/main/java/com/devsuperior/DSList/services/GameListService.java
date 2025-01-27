@@ -9,10 +9,14 @@ import org.springframework.transaction.annotation.Transactional;
 import com.devsuperior.DSList.dto.GameListDTO;
 import com.devsuperior.DSList.entities.GameList;
 import com.devsuperior.DSList.repositories.GameListRepository;
+import com.devsuperior.DSList.repositories.GameRepository;
+import com.devsuperior.projections.GameMinProjection;
 
 @Service
 public class GameListService {
 
+    @Autowired
+    private GameRepository gameRepository;
 
     @Autowired
     private GameListRepository gameListRepository;
@@ -23,5 +27,19 @@ public class GameListService {
         List<GameListDTO> dto = result.stream().map(x -> new GameListDTO(x)).toList();
         return dto;
     }
+    @Transactional
+    public void move(Long listId, int sourceIndex, int destinationIndex){
+        List<GameMinProjection> list = gameRepository.searchByList(listId);
+        GameMinProjection obj = list.remove(sourceIndex);
+        list.add(destinationIndex, obj);
+
+        int min = sourceIndex < destinationIndex ? sourceIndex : destinationIndex;
+        int max = sourceIndex < destinationIndex ? destinationIndex : sourceIndex;
+
+        for(int i = min; i <= max; i++){
+            gameListRepository.updateBelongingPosition(listId, list.get(i).getId(), i);
+        }
+    }
+
 
 }
